@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useClassificationStore } from "@/store/useClassificationStore";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -18,20 +18,45 @@ const ImageViewer = () => {
   const currentImage = getCurrentImage();
   
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [debugInfo, setDebugInfo] = useState<any>(null);
+  
+  useEffect(() => {
+    // For debugging purposes
+    if (currentTest) {
+      setDebugInfo({
+        testId: currentTest.id,
+        testName: currentTest.name,
+        totalImages: currentTest.images.length,
+        currentImageIndex,
+        hasCurrentImage: !!currentImage,
+        imageId: currentImage?.id
+      });
+    }
+  }, [currentTest, currentImage, currentImageIndex]);
   
   if (!currentTest || !currentImage) {
-    return <div className="flex justify-center items-center h-64">Aucune image disponible</div>;
+    console.error("No test or image available", { currentTest, currentImage, debugInfo });
+    return (
+      <div className="flex flex-col justify-center items-center h-64 p-4">
+        <div className="text-center text-red-500 mb-4">Aucune image disponible</div>
+        <pre className="bg-gray-100 p-2 text-xs overflow-auto max-w-full">
+          {JSON.stringify(debugInfo, null, 2)}
+        </pre>
+      </div>
+    );
   }
   
   const totalImages = currentTest.images.length;
   const selectedLabel = selections[currentImage.id];
   
   const handlePrev = () => {
+    console.log("Navigate to previous image", { currentImageIndex });
     setImageLoaded(false);
     prevImage();
   };
   
   const handleNext = () => {
+    console.log("Navigate to next image", { currentImageIndex });
     setImageLoaded(false);
     nextImage();
   };
@@ -82,6 +107,16 @@ const ImageViewer = () => {
           </div>
         )}
       </div>
+      
+      {/* Debug information during development */}
+      {process.env.NODE_ENV !== "production" && debugInfo && (
+        <div className="mt-4 p-2 bg-gray-100 rounded text-xs overflow-auto max-h-32">
+          <details>
+            <summary>Debug Info</summary>
+            <pre>{JSON.stringify(debugInfo, null, 2)}</pre>
+          </details>
+        </div>
+      )}
     </div>
   );
 };

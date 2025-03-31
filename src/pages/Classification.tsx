@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useClassificationStore } from "@/store/useClassificationStore";
 import Header from "@/components/Header";
@@ -14,16 +14,33 @@ const Classification = () => {
     getCurrentImage, 
     selections, 
     resetSelections, 
-    validateSelections
+    validateSelections,
+    currentTestId
   } = useClassificationStore();
+  
+  const [resetting, setResetting] = useState(false);
+  
+  // Check if we have a valid test
+  useEffect(() => {
+    const currentTest = getCurrentTest();
+    const currentImage = getCurrentImage();
+    
+    console.log("Classification page mounted", { 
+      hasTest: !!currentTest, 
+      hasImage: !!currentImage,
+      testId: currentTestId
+    });
+    
+    if (!currentTest || !currentImage) {
+      console.error("No test selected, redirecting to index");
+      navigate("/");
+    }
+  }, [getCurrentTest, getCurrentImage, navigate, currentTestId]);
   
   const currentTest = getCurrentTest();
   const currentImage = getCurrentImage();
   
-  const [resetting, setResetting] = useState(false);
-  
   if (!currentTest || !currentImage) {
-    navigate("/");
     return null;
   }
   

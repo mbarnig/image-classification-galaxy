@@ -3,12 +3,19 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useClassificationStore } from "@/store/useClassificationStore";
+import { useEffect } from "react";
 
 const Index = () => {
   const navigate = useNavigate();
-  const { tests, setCurrentTest } = useClassificationStore();
+  const { tests, setCurrentTest, currentTestId } = useClassificationStore();
+  
+  // Reset test selection when landing on the index page
+  useEffect(() => {
+    console.log("Index page mounted, current test ID:", currentTestId);
+  }, [currentTestId]);
   
   const handleSelectTest = (testId: number) => {
+    console.log("Test selected:", testId);
     setCurrentTest(testId);
     navigate("/classification");
   };
