@@ -16,6 +16,7 @@ const ImageViewer = () => {
     getCurrentTest, 
     getCurrentImage, 
     currentImageIndex,
+    selections,
     setCurrentImageIndex
   } = useClassificationStore();
   
@@ -88,20 +89,19 @@ const ImageViewer = () => {
   };
 
   return (
-    <div className="relative p-4 mt-4 mb-24 animate-fade-in">
+    <div className="relative py-4 my-20 animate-fade-in flex-1 flex items-center justify-center">
       {/* Image carousel */}
-      <div className="mb-6">
+      <div className="w-full">
         <Carousel 
           className="w-full max-w-3xl mx-auto"
           opts={{
             align: "start",
             loop: false,
-            axis: isMobile ? "y" : "x"
           }}
           orientation={isMobile ? "vertical" : "horizontal"}
           setApi={setCarouselApi}
         >
-          <CarouselContent className={isMobile ? "flex-col h-[60vh]" : "h-auto"}>
+          <CarouselContent className={isMobile ? "flex-col h-[70vh]" : "h-auto"}>
             {currentTest.images.map((image, index) => (
               <CarouselItem 
                 key={image.id} 
@@ -118,6 +118,18 @@ const ImageViewer = () => {
                       }
                     }}
                   />
+                  
+                  {/* Image number overlay */}
+                  <div className="absolute top-2 left-2 bg-black bg-opacity-60 text-white px-2 py-1 rounded text-sm font-bold">
+                    {index + 1} / {currentTest.images.length}
+                  </div>
+                  
+                  {/* Classification overlay */}
+                  {selections[image.id] && (
+                    <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-60 text-white p-2 text-center">
+                      {selections[image.id]}
+                    </div>
+                  )}
                 </div>
               </CarouselItem>
             ))}

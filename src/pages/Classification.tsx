@@ -79,7 +79,7 @@ const Classification = () => {
         showSelect={true} 
       />
       
-      <div className="container mx-auto px-4 py-2 flex-1 flex flex-col">
+      <div className="container mx-auto px-4 flex-1 flex flex-col pt-16">
         <ImageViewer />
       </div>
       
