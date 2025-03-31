@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useClassificationStore } from "@/store/useClassificationStore";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -13,6 +13,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import type { CarouselApi } from "@/components/ui/carousel";
 
 const ImageViewer = () => {
   const { 
@@ -32,6 +33,7 @@ const ImageViewer = () => {
   
   const [imageLoaded, setImageLoaded] = useState(false);
   const [debugInfo, setDebugInfo] = useState<any>(null);
+  const [carouselApi, setCarouselApi] = useState<CarouselApi | null>(null);
   
   useEffect(() => {
     // For debugging purposes
@@ -50,6 +52,30 @@ const ImageViewer = () => {
     setImageLoaded(false);
   }, [currentTest, currentImage, currentImageIndex]);
   
+  // Sync carousel with current image index
+  useEffect(() => {
+    if (carouselApi && currentImageIndex !== undefined) {
+      carouselApi.scrollTo(currentImageIndex);
+    }
+  }, [carouselApi, currentImageIndex]);
+  
+  const handleCarouselChange = useCallback(() => {
+    if (carouselApi) {
+      const selectedIndex = carouselApi.selectedScrollSnap();
+      setCurrentImageIndex(selectedIndex);
+    }
+  }, [carouselApi, setCurrentImageIndex]);
+  
+  // Set up carousel change listener
+  useEffect(() => {
+    if (carouselApi) {
+      carouselApi.on("select", handleCarouselChange);
+      return () => {
+        carouselApi.off("select", handleCarouselChange);
+      };
+    }
+  }, [carouselApi, handleCarouselChange]);
+  
   if (!currentTest || !currentImage) {
     console.error("No test or image available", { currentTest, currentImage, debugInfo });
     return (
@@ -64,6 +90,9 @@ const ImageViewer = () => {
   
   const handleImageSelect = (index: number) => {
     setCurrentImageIndex(index);
+    if (carouselApi) {
+      carouselApi.scrollTo(index);
+    }
   };
 
   const handleSelectLabel = (label: string) => {
@@ -82,15 +111,11 @@ const ImageViewer = () => {
           opts={{
             align: "start",
             loop: false,
-            direction: isMobile ? "y" : "x",
+            // Use proper axis type for embla carousel
+            axis: isMobile ? "y" : "x",
           }}
           orientation={isMobile ? "vertical" : "horizontal"}
-          onSelect={(api) => {
-            if (api) {
-              const index = api.selectedScrollSnap();
-              setCurrentImageIndex(index);
-            }
-          }}
+          setApi={setCarouselApi}
         >
           <CarouselContent className={isMobile ? "flex-col h-[60vh]" : "h-auto"}>
             {currentTest.images.map((image, index) => (
@@ -132,7 +157,7 @@ const ImageViewer = () => {
       </div>
 
       {/* Navigation indicators */}
-      <div className="flex justify-center gap-2 mb-4">
+      <div className="flex justify-center gap-2 mb-4 flex-wrap">
         {currentTest.images.map((image, index) => (
           <Button
             key={index}
