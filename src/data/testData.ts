@@ -5,7 +5,7 @@ export const SAMPLE_IMAGES = [
   "/lovable-uploads/galaxie_spirale.jpg",
   "/lovable-uploads/galaxie_elliptique.jpg",
   "/lovable-uploads/galaxie_irreguliere.jpg",
-  "/lovable-uploads/galaxie_lenticuliere.jpg",
+  "/lovable-uploads/galaxie_lenticulaire.jpg",
   "/lovable-uploads/amas_etoiles.jpg",
   "/lovable-uploads/carre.jpg",
   "/lovable-uploads/triangle.jpg",
