@@ -79,7 +79,9 @@ const Classification = () => {
         showSelect={true} 
       />
       
-      <ImageViewer />
+      <div className="container mx-auto px-4 py-4">
+        <ImageViewer />
+      </div>
       
       <Footer 
         onSubmit={handleSubmit} 
