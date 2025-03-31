@@ -4,6 +4,15 @@ import { useClassificationStore } from "@/store/useClassificationStore";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
+import { useIsMobile } from "@/hooks/use-mobile";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const ImageViewer = () => {
   const { 
@@ -13,11 +22,13 @@ const ImageViewer = () => {
     prevImage, 
     currentImageIndex,
     selections,
-    selectLabel
+    selectLabel,
+    setCurrentImageIndex
   } = useClassificationStore();
   
   const currentTest = getCurrentTest();
   const currentImage = getCurrentImage();
+  const isMobile = useIsMobile();
   
   const [imageLoaded, setImageLoaded] = useState(false);
   const [debugInfo, setDebugInfo] = useState<any>(null);
@@ -51,98 +62,118 @@ const ImageViewer = () => {
     );
   }
   
-  const totalImages = currentTest.images.length;
-  const selectedLabel = selections[currentImage.id];
-  
-  const handlePrev = () => {
-    console.log("Navigate to previous image", { currentImageIndex });
-    setImageLoaded(false);
-    prevImage();
+  const handleImageSelect = (index: number) => {
+    setCurrentImageIndex(index);
   };
-  
-  const handleNext = () => {
-    console.log("Navigate to next image", { currentImageIndex });
-    setImageLoaded(false);
-    nextImage();
-  };
-  
+
   const handleSelectLabel = (label: string) => {
-    selectLabel(currentImage.id, label);
-    toast.success(`Image classifiée comme "${label}"`);
+    if (currentImage) {
+      selectLabel(currentImage.id, label);
+      toast.success(`Image classifiée comme "${label}"`);
+    }
   };
-  
+
   return (
-    <div className="relative p-4 mt-8 mb-32 animate-fade-in">
-      {/* Navigation controls */}
-      <div className="flex justify-between items-center mb-4">
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={handlePrev}
-          disabled={currentImageIndex === 0}
-          className="rounded-full border-2 h-12 w-12 shadow-md"
+    <div className="relative p-4 mt-4 mb-24 animate-fade-in">
+      {/* Image carousel */}
+      <div className="mb-6">
+        <Carousel 
+          className="w-full max-w-3xl mx-auto"
+          opts={{
+            align: "start",
+            loop: false,
+            direction: isMobile ? "y" : "x",
+          }}
+          orientation={isMobile ? "vertical" : "horizontal"}
+          onSelect={(api) => {
+            if (api) {
+              const index = api.selectedScrollSnap();
+              setCurrentImageIndex(index);
+            }
+          }}
         >
-          <ChevronLeft className="h-6 w-6" />
-        </Button>
-        
-        <div className="text-sm font-medium text-gray-700 bg-white py-2 px-4 rounded-full shadow">
-          Image {currentImageIndex + 1} sur {totalImages}
-        </div>
-        
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={handleNext}
-          disabled={currentImageIndex === totalImages - 1}
-          className="rounded-full border-2 h-12 w-12 shadow-md"
-        >
-          <ChevronRight className="h-6 w-6" />
-        </Button>
-      </div>
-      
-      {/* Image display */}
-      <div className="relative rounded-lg overflow-hidden shadow-lg bg-gray-100 aspect-video max-w-2xl mx-auto">
-        <div className="absolute top-2 left-2 bg-black bg-opacity-70 text-white rounded-md px-2 py-1 text-sm z-10">
-          {String(currentImage.id).padStart(2, '0')}
-        </div>
-        
-        <img 
-          src={currentImage.src} 
-          alt={`Image ${currentImage.id}`} 
-          className={`w-full h-full object-contain transition-opacity duration-300 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
-          onLoad={() => setImageLoaded(true)}
-        />
-        
-        {!imageLoaded && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="animate-spin h-10 w-10 border-4 border-app-blue border-t-transparent rounded-full"></div>
+          <CarouselContent className={isMobile ? "flex-col h-[60vh]" : "h-auto"}>
+            {currentTest.images.map((image, index) => (
+              <CarouselItem 
+                key={image.id} 
+                className={`${isMobile ? "pt-4 h-full" : "pl-4"}`}
+              >
+                <div className={`relative rounded-lg overflow-hidden shadow-lg bg-gray-100 ${isMobile ? "h-full" : "aspect-video"} flex items-center justify-center`}>
+                  <div className="absolute top-2 left-2 bg-black bg-opacity-70 text-white rounded-md px-2 py-1 text-sm z-10">
+                    {String(image.id).padStart(2, '0')}
+                  </div>
+                  
+                  <img 
+                    src={image.src} 
+                    alt={`Image ${image.id}`} 
+                    className="max-w-full max-h-full object-contain"
+                    onLoad={() => {
+                      if (index === currentImageIndex) {
+                        setImageLoaded(true);
+                      }
+                    }}
+                  />
+                  
+                  {selections[image.id] && (
+                    <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 text-white px-4 py-2">
+                      {selections[image.id]}
+                    </div>
+                  )}
+                </div>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+          
+          <div className={`flex ${isMobile ? "flex-col h-full absolute right-0 top-0" : "justify-between mt-4"}`}>
+            <CarouselPrevious className={`${isMobile ? "-left-0 top-1/2" : ""} z-10`} />
+            <CarouselNext className={`${isMobile ? "-right-0 top-1/2" : ""} z-10`} />
           </div>
-        )}
-        
-        {selectedLabel && (
-          <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 text-white px-4 py-2">
-            {selectedLabel}
-          </div>
-        )}
+        </Carousel>
       </div>
-      
-      {/* Label selection buttons */}
-      <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 max-w-2xl mx-auto">
-        {currentTest.labels.map((label) => (
+
+      {/* Navigation indicators */}
+      <div className="flex justify-center gap-2 mb-4">
+        {currentTest.images.map((image, index) => (
           <Button
-            key={label}
-            variant={selectedLabel === label ? "default" : "outline"}
-            onClick={() => handleSelectLabel(label)}
-            className={`text-sm transition-all ${
-              selectedLabel === label 
-                ? 'bg-app-blue hover:bg-blue-700' 
-                : 'hover:border-app-blue hover:text-app-blue'
+            key={index}
+            variant="outline"
+            size="sm"
+            className={`w-8 h-8 p-0 rounded-full ${
+              index === currentImageIndex 
+                ? "bg-app-blue text-white border-app-blue" 
+                : "bg-transparent"
             }`}
+            onClick={() => handleImageSelect(index)}
           >
-            {label}
+            {index + 1}
           </Button>
         ))}
       </div>
+      
+      {/* Current image info */}
+      <div className="text-sm font-medium text-center text-gray-700 bg-white py-2 px-4 rounded-full shadow mb-6 max-w-fit mx-auto">
+        Image {currentImageIndex + 1} sur {currentTest.images.length}
+      </div>
+      
+      {/* Label selection buttons */}
+      <ScrollArea className="h-auto max-w-2xl mx-auto">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-2 p-1">
+          {currentTest.labels.map((label) => (
+            <Button
+              key={label}
+              variant={selections[currentImage.id] === label ? "default" : "outline"}
+              onClick={() => handleSelectLabel(label)}
+              className={`text-sm transition-all ${
+                selections[currentImage.id] === label 
+                  ? 'bg-app-blue hover:bg-blue-700' 
+                  : 'hover:border-app-blue hover:text-app-blue'
+              }`}
+            >
+              {label}
+            </Button>
+          ))}
+        </div>
+      </ScrollArea>
       
       {/* Debug information during development */}
       {process.env.NODE_ENV !== "production" && debugInfo && (

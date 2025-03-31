@@ -1,4 +1,3 @@
-
 import { create } from 'zustand';
 import { Test, ClassificationResult } from '@/types';
 import { testData } from '@/data/testData';
@@ -21,6 +20,7 @@ interface ClassificationState {
   getCurrentImage: () => { id: number; src: string } | undefined;
   hasNextTest: () => boolean;
   goToNextTest: () => void;
+  setCurrentImageIndex: (index: number) => void;
 }
 
 export const useClassificationStore = create<ClassificationState>((set, get) => ({
@@ -47,6 +47,21 @@ export const useClassificationStore = create<ClassificationState>((set, get) => 
         currentTest: state.getCurrentTest()
       });
     }, 0);
+  },
+  
+  setCurrentImageIndex: (index: number) => {
+    const currentTest = get().getCurrentTest();
+    if (!currentTest) {
+      console.error("Cannot set image index: No current test");
+      return;
+    }
+    
+    if (index >= 0 && index < currentTest.images.length) {
+      console.log("Setting current image index to:", index);
+      set({ currentImageIndex: index });
+    } else {
+      console.error("Image index out of range:", { index, totalImages: currentTest.images.length });
+    }
   },
   
   nextImage: () => {
