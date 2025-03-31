@@ -1,9 +1,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useClassificationStore } from "@/store/useClassificationStore";
-import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { toast } from "sonner";
 import {
   Carousel,
   CarouselContent,
@@ -12,15 +10,12 @@ import {
   CarouselPrevious,
   type CarouselApi
 } from "@/components/ui/carousel";
-import { ScrollArea } from "@/components/ui/scroll-area";
 
 const ImageViewer = () => {
   const { 
     getCurrentTest, 
     getCurrentImage, 
     currentImageIndex,
-    selections,
-    selectLabel,
     setCurrentImageIndex
   } = useClassificationStore();
   
@@ -92,13 +87,6 @@ const ImageViewer = () => {
     }
   };
 
-  const handleSelectLabel = (label: string) => {
-    if (currentImage) {
-      selectLabel(currentImage.id, label);
-      toast.success(`Image classifiée comme "${label}"`);
-    }
-  };
-
   return (
     <div className="relative p-4 mt-4 mb-24 animate-fade-in">
       {/* Image carousel */}
@@ -141,26 +129,6 @@ const ImageViewer = () => {
           </div>
         </Carousel>
       </div>
-      
-      {/* Label selection buttons */}
-      <ScrollArea className="h-auto max-w-2xl mx-auto">
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-2 p-1">
-          {currentTest.labels.map((label) => (
-            <Button
-              key={label}
-              variant={selections[currentImage.id] === label ? "default" : "outline"}
-              onClick={() => handleSelectLabel(label)}
-              className={`text-sm transition-all ${
-                selections[currentImage.id] === label 
-                  ? 'bg-app-blue hover:bg-blue-700' 
-                  : 'hover:border-app-blue hover:text-app-blue'
-              }`}
-            >
-              {label}
-            </Button>
-          ))}
-        </div>
-      </ScrollArea>
       
       {/* Debug information during development */}
       {process.env.NODE_ENV !== "production" && debugInfo && (
