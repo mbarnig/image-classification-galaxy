@@ -2,11 +2,16 @@
 import { Test } from "@/types";
 
 export const SAMPLE_IMAGES = [
-  "/lovable-uploads/cd71cf85-be14-4758-b41c-dae270a469be.png",
-  "/lovable-uploads/ac03ed3f-7c7f-4136-8f0c-9eb72159ece6.png",
-  "https://images.unsplash.com/photo-1649972904349-6e44c42644a7",
-  "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b",
-  "https://images.unsplash.com/photo-1518770660439-4636190af475"
+  "/lovable-uploads/galaxie_spirale.jpg",
+  "/lovable-uploads/galaxie_elliptique.jpg",
+  "/lovable-uploads/galaxie_irreguliere.jpg",
+  "/lovable-uploads/galaxie-lenticuliere.jpg",
+  "/lovable-uploads/amas_etoiles.jpg",
+  "/lovable-uploads/carre.jpg",
+  "/lovable-uploads/triangle.jpg",
+  "/lovable-uploads/cercle.jpg",
+  "/lovable-uploads/rectangle.jpg",
+  "/lovable-uploads/hexagone.jpg",
 ];
 
 export const testData: Test[] = [
@@ -39,11 +44,11 @@ export const testData: Test[] = [
     id: 2,
     name: "Classification des Formes",
     images: [
-      { id: 1, src: SAMPLE_IMAGES[2] },
-      { id: 2, src: SAMPLE_IMAGES[3] },
-      { id: 3, src: SAMPLE_IMAGES[4] },
-      { id: 4, src: SAMPLE_IMAGES[0] },
-      { id: 5, src: SAMPLE_IMAGES[1] }
+      { id: 1, src: SAMPLE_IMAGES[5] },
+      { id: 2, src: SAMPLE_IMAGES[6] },
+      { id: 3, src: SAMPLE_IMAGES[7] },
+      { id: 4, src: SAMPLE_IMAGES[8] },
+      { id: 5, src: SAMPLE_IMAGES[9] }
     ],
     labels: [
       "Carré",
@@ -53,11 +58,11 @@ export const testData: Test[] = [
       "Hexagone"
     ],
     correctAnswers: {
-      1: "Cercle",
-      2: "Rectangle",
-      3: "Triangle",
-      4: "Hexagone",
-      5: "Carré"
+      1: "Carré",
+      2: "Triangle",
+      3: "Cercle",
+      4: "Rectangle",
+      5: "Hexagone"
     }
   }
 ];
