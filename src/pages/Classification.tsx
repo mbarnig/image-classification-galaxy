@@ -5,7 +5,7 @@ import { useClassificationStore } from "@/store/useClassificationStore";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ImageViewer from "@/components/ImageViewer";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "sonner";
 
 const Classification = () => {
   const navigate = useNavigate();
